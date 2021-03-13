@@ -1,0 +1,142 @@
+
+<pre name="code" class="html"><pre name="code" class="html"><pre name="code" class="html"><?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cn.pri.qk</groupId>
+    <artifactId>QSProject</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>A Test Project</name>
+    <!--定义项目的打包方式,可选值为:jar（默认), war, pom, apk, 如果一个项目是父项目，那么必须设置为pom。-->
+    <packaging>jar</packaging>
+    <!--使用<properties>元素来定义一些常量,即便于统一修改,又能减少出错的几率-->
+    <properties>
+        <project.version>1.0</project.version>
+        <jdk.version>1.8</jdk.version>
+        <springFramework.version>2.5.6</springFramework.version>
+    </properties>
+ 
+    <reporting>
+        <plugins>
+            <!--这个插件用来为主目录的代码生成javadoc文件,可参见:
+            http://maven.apache.org/plugins/maven-site-plugin/examples/configuring-reports.html
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9</version>
+                <reportSets>
+                    <reportSet>
+                        <!-- by default, id = "default" -->
+                        <reports>
+                            <!-- select non-aggregate reports -->
+                            <report>javadoc</report>
+                            <report>test-javadoc</report>
+                        </reports>
+                    </reportSet>
+                    <reportSet>
+                        <!-- aggregate reportSet, to define in poms having modules -->
+                        <id>aggregate</id>
+                        <inherited>false</inherited>
+                        <!-- don't run aggregate in child modules -->
+                        <reports>
+                            <report>aggregate</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+ 
+    </reporting>
+ 
+    <build>
+        <!-- 项目源代码的主目录 -->
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <!-- 项目测试代码的主目录 -->
+        <testSourceDirectory>src/test/java</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <!-- 这个插件用来将项目打成可运行的jar包 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.handlers</resource>
+                                </transformer>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.schemas</resource>
+                                </transformer>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"> <!-- 指定可运行jar包的入口类 -->
+                                    <mainClass>cn.pri.qk.Main</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+ 
+    <!-- 添加一些依赖的jar包 -->
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.7</version>
+            <!-- 该依赖只对测试有效, 可选值为:compile(默认值,在所有的classpath中均可用), provided, runtime, test, system. http://blog.sina.com.cn/s/blog_67aaf4440101dwr8.html-->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom2</artifactId>
+            <version>2.0.6</version>
+            <scope>compile</scope>
+        </dependency>
+        <!--optional选项用来解决互斥的依赖。如下面这两个依赖是可选依赖,但其他项目依赖当前项目时,该依赖不会被传递过去.使用可选依赖就意味着项目里存在两个或多个互斥的特性, 这不满足单一职责的原则,所以应尽量避免使用可选依赖-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.10</version>
+            <optional>true</optional>
+            <!--<exclusions>元素用来移除当前依赖项所依赖的部分依赖项,因为那些依赖项有可能是某个project的SNAPSHOT版本或需要收费-->
+            <exclusions>
+                <exclusion>
+                    <groupId>mysql</groupId>
+                    <artifactId>project</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>8.4-701.jdbc3</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <!--使用预定义好的常量-->
+            <version>${springFramework.version}</version>
+        </dependency>
+    </dependencies>
+</project>
